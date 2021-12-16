@@ -55,6 +55,8 @@ macro_rules! make_event {
         }
 
         impl $name {
+            #[inline] pub fn current_target(&self) -> Option<EventTarget> { self.event.current_target() }
+
             #[inline] pub fn prevent_default(&self) { self.event.prevent_default(); }
 
             #[inline] pub fn stop_propagation(&self) { self.event.stop_propagation(); }
