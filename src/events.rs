@@ -195,6 +195,7 @@ make_input_event!(BeforeInput, "beforeinput");
 
 make_event!(Load, "load" => web_sys::Event);
 make_event!(Scroll, "scroll" => web_sys::Event);
+make_event!(Submit, "submit" => web_sys::Event);
 make_event!(Resize, "resize" => web_sys::UiEvent);
 
 
