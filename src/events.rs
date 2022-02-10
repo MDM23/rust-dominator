@@ -1,6 +1,6 @@
 use crate::traits::StaticEvent;
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement};
+use web_sys::{EventTarget, HtmlInputElement, HtmlTextAreaElement, TouchList};
 
 
 #[cfg(feature = "nightly")]
@@ -124,6 +124,22 @@ macro_rules! make_mouse_event {
     };
 }
 
+macro_rules! make_touch_event {
+    ($name:ident, $type:literal) => {
+        make_event!($name, $type => web_sys::TouchEvent);
+
+        impl $name {
+            #[inline] pub fn ctrl_key(&self) -> bool { self.event.ctrl_key() || self.event.meta_key() }
+            #[inline] pub fn shift_key(&self) -> bool { self.event.shift_key() }
+            #[inline] pub fn alt_key(&self) -> bool { self.event.alt_key() }
+    
+            #[inline] pub fn changed_touches(&self) -> TouchList { self.event.changed_touches() }
+            #[inline] pub fn target_touches(&self) -> TouchList { self.event.target_touches() }
+            #[inline] pub fn touches(&self) -> TouchList { self.event.touches() }
+        }
+    };
+}
+
 macro_rules! make_keyboard_event {
     ($name:ident, $type:literal) => {
         make_event!($name, $type => web_sys::KeyboardEvent);
@@ -175,6 +191,9 @@ make_mouse_event!(MouseEnter, "mouseenter" => web_sys::MouseEvent);
 make_mouse_event!(MouseLeave, "mouseleave" => web_sys::MouseEvent);
 make_mouse_event!(DoubleClick, "dblclick" => web_sys::MouseEvent);
 make_mouse_event!(ContextMenu, "contextmenu" => web_sys::MouseEvent);
+
+make_touch_event!(TouchEnd, "touchend");
+make_touch_event!(TouchStart, "touchstart");
 
 make_keyboard_event!(KeyDown, "keydown");
 make_keyboard_event!(KeyUp, "keyup");
