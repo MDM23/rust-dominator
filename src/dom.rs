@@ -5,7 +5,7 @@ use std::future::Future;
 use std::task::{Context, Poll};
 
 use once_cell::sync::Lazy;
-use futures_signals::signal::{Signal, not};
+use futures_signals::signal::{Signal, not, SignalExt};
 use futures_signals::signal_vec::SignalVec;
 use futures_util::FutureExt;
 use futures_channel::oneshot;
@@ -15,6 +15,7 @@ use web_sys::{HtmlElement, Node, EventTarget, Element, CssStyleSheet, CssStyleDe
 
 use crate::bindings;
 use crate::callbacks::Callbacks;
+use crate::routing::{Route, Router, RouteMatch};
 use crate::traits::*;
 use crate::operations;
 use crate::operations::{for_each, spawn_future};
@@ -699,6 +700,31 @@ impl<A> DomBuilder<A> where A: AsRef<Node> {
         where B: SignalVec<Item = Dom> + 'static {
 
         operations::insert_children_signal_vec(self.element.as_ref().clone(), &mut self.callbacks, children);
+        self
+    }
+
+    #[inline]
+    pub fn router(mut self, routes: &[(&str, fn() -> Dom)]) -> Self {
+        let routes: Vec<Route> = routes
+            .iter()
+            .map(|&(path, resolver)| Route::new(path, resolver))
+            .collect();
+
+        operations::insert_child_signal(
+            self.element.as_ref().clone(),
+            &mut self.callbacks,
+            Router::signal_path().map(move |path| {
+                routes.iter().find_map(|r| {
+                    r.matches(&path).map(|m| {
+                        Router::set_remainder(m.remainder());
+                        m
+                    })
+                })
+            })
+            .dedupe_cloned()
+            .map(|m: Option<RouteMatch>| m.map(|m| m.route().resolve()))
+        );
+
         self
     }
 }
