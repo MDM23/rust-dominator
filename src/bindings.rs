@@ -58,14 +58,8 @@ pub(crate) fn ready_state() -> String {
     DOCUMENT.with(|d| d.ready_state())
 }
 
-pub(crate) fn current_url() -> String {
-    WINDOW.with(|w| w.location().href().unwrap_throw())
-}
-
-pub(crate) fn go_to_url(url: &str) {
-    HISTORY.with(|h| {
-        h.push_state_with_url(&JsValue::NULL, "", Some(url)).unwrap_throw();
-    });
+pub(crate) fn current_pathname() -> String {
+    WINDOW.with(|w| w.location().pathname().unwrap_throw())
 }
 
 pub(crate) fn create_stylesheet() -> CssStyleSheet {
