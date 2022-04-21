@@ -124,6 +124,29 @@ macro_rules! make_mouse_event {
     };
 }
 
+macro_rules! make_pointer_event {
+    ($name:ident, $type:literal) => {
+        make_mouse_event!($name, $type => web_sys::PointerEvent);
+
+        impl $name {
+            #[inline] pub fn pointer_id(&self) -> i32 { self.event.pointer_id() }
+
+            #[inline] pub fn pointer_width(&self) -> i32 { self.event.width() }
+            #[inline] pub fn pointer_height(&self) -> i32 { self.event.height() }
+
+            #[inline] pub fn pressure(&self) -> f32 { self.event.pressure() }
+            #[inline] pub fn tangential_pressure(&self) -> f32 { self.event.tangential_pressure() }
+
+            #[inline] pub fn tilt_x(&self) -> i32 { self.event.tilt_x() }
+            #[inline] pub fn tilt_y(&self) -> i32 { self.event.tilt_y() }
+
+            #[inline] pub fn twist(&self) -> i32 { self.event.twist() }
+
+            #[inline] pub fn is_primary(&self) -> bool { self.event.is_primary() }
+        }
+    };
+}
+
 macro_rules! make_touch_event {
     ($name:ident, $type:literal) => {
         make_event!($name, $type => web_sys::TouchEvent);
@@ -159,6 +182,10 @@ macro_rules! make_keyboard_event {
 macro_rules! make_focus_event {
     ($name:ident, $type:literal) => {
         make_event!($name, $type => web_sys::FocusEvent);
+
+        impl $name {
+            #[inline] pub fn related_target(&self) -> Option<EventTarget> { self.event.related_target() }
+        }
     };
 }
 
@@ -182,6 +209,30 @@ macro_rules! make_input_event {
     };
 }
 
+macro_rules! make_animation_event {
+    ($name:ident, $type:literal) => {
+        make_event!($name, $type => web_sys::AnimationEvent);
+
+        impl $name {
+            #[inline] pub fn animation_name(&self) -> String { self.event.animation_name() }
+            #[inline] pub fn elapsed_time(&self) -> f32 { self.event.elapsed_time() }
+            #[inline] pub fn pseudo_element(&self) -> String { self.event.pseudo_element() }
+        }
+    };
+}
+
+macro_rules! make_wheel_event {
+    ($name:ident, $type:literal) => {
+        make_mouse_event!($name, $type => web_sys::WheelEvent);
+
+        impl $name {
+            #[inline] pub fn delta_x(&self) -> f64 { self.event.delta_x() }
+            #[inline] pub fn delta_y(&self) -> f64 { self.event.delta_y() }
+            #[inline] pub fn delta_z(&self) -> f64 { self.event.delta_z() }
+        }
+    };
+}
+
 
 make_mouse_event!(Click, "click" => web_sys::MouseEvent);
 make_mouse_event!(MouseDown, "mousedown" => web_sys::MouseEvent);
@@ -192,6 +243,17 @@ make_mouse_event!(MouseLeave, "mouseleave" => web_sys::MouseEvent);
 make_mouse_event!(DoubleClick, "dblclick" => web_sys::MouseEvent);
 make_mouse_event!(ContextMenu, "contextmenu" => web_sys::MouseEvent);
 
+make_pointer_event!(PointerOver, "pointerover");
+make_pointer_event!(PointerEnter, "pointerenter");
+make_pointer_event!(PointerDown, "pointerdown");
+make_pointer_event!(PointerMove, "pointermove");
+make_pointer_event!(PointerUp, "pointerup");
+make_pointer_event!(PointerCancel, "pointercancel");
+make_pointer_event!(PointerOut, "pointerout");
+make_pointer_event!(PointerLeave, "pointerleave");
+make_pointer_event!(GotPointerCapture, "gotpointercapture");
+make_pointer_event!(LostPointerCapture, "lostpointercapture");
+
 make_touch_event!(TouchEnd, "touchend");
 make_touch_event!(TouchStart, "touchstart");
 
@@ -200,6 +262,8 @@ make_keyboard_event!(KeyUp, "keyup");
 
 make_focus_event!(Focus, "focus");
 make_focus_event!(Blur, "blur");
+make_focus_event!(FocusIn, "focusin");
+make_focus_event!(FocusOut, "focusout");
 
 make_drag_event!(DragStart, "dragstart");
 make_drag_event!(Drag, "drag");
@@ -211,6 +275,13 @@ make_drag_event!(Drop, "drop");
 
 make_input_event!(Input, "input");
 make_input_event!(BeforeInput, "beforeinput");
+
+make_animation_event!(AnimationStart, "animationstart");
+make_animation_event!(AnimationIteration, "animationiteration");
+make_animation_event!(AnimationCancel, "animationcancel");
+make_animation_event!(AnimationEnd, "animationend");
+
+make_wheel_event!(Wheel, "wheel");
 
 make_event!(Load, "load" => web_sys::Event);
 make_event!(Scroll, "scroll" => web_sys::Event);
