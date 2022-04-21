@@ -36,7 +36,7 @@ impl Router {
         ROUTER.with(|r| r.remainder.replace(remainder));
     }
 
-    pub fn goto(&self, path: &str) {
+    pub fn goto(path: &str) {
         ROUTER.with(|r| {
             let segments = split_path(path);
 
